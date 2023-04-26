@@ -1,3 +1,11 @@
+/*
+ * @Author: Profigogogogo wf851128@gmail.com
+ * @Date: 2023-04-26 21:13:43
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-04-26 23:59:05
+ * @FilePath: /go-sys/model/sys_user.go
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 package model
 
 import (
@@ -9,17 +17,18 @@ import (
 
 // User represents the user table and json data
 type SysUser struct {
-	UserId   uint       `json:"userId" gorm:"primaryKey;autoIncrement;comment:用户ID"` //用户ID
-	UserName string     `json:"username" gorm:"size:64;comment:用户名"`                 //用户名
-	Password string     `json:"-" gorm:"size:128;comment:密码"`                        //密码
-	NickName string     `json:"nickName" gorm:"size:128;comment:昵称"`                 //昵称
-	Sex      string     `json:"sex" gorm:"size:255;comment:性别"`                      //性别
-	Salt     string     `json:"-" gorm:"size:255;comment:加盐"`                        //加盐
-	Email    string     `json:"email" gorm:"size:128;comment:邮箱"`                    //邮箱
-	Phone    string     `json:"phone" gorm:"size:11;comment:手机号"`                    //手机号
-	OrgID    uint       `json:"orgID" gorm:"primaryKey;comment:编码"`                  //编码
-	Status   int        `json:"status" gorm:"size:4;comment:状态"`                     //状态
-	Roles    []*SysRole `json:"sysr_roles" gorm:"many2many:user_role;"`              //	角色关联
+	UserId         uint             `gorm:"primaryKey;autoIncrement;comment:用户ID" json:"userId"` //用户ID
+	UserName       string           `gorm:"size:64;comment:用户名" json:"username"`                 //用户名
+	Password       string           `gorm:"size:128;comment:密码" json:"-"`                        //密码
+	NickName       string           `gorm:"size:128;comment:昵称" json:"nickName"`                 //昵称
+	Sex            string           `gorm:"size:255;comment:性别" json:"sex"`                      //性别
+	Salt           string           `gorm:"size:255;comment:加盐" json:"-"`                        //加盐
+	Email          string           `gorm:"size:128;comment:邮箱" json:"email"`                    //邮箱
+	Phone          string           `gorm:"size:11;comment:手机号" json:"phone"`                    //手机号
+	Status         int              `gorm:"size:4;comment:状态" json:"status"`                     //状态
+	Roles          []*SysRole       `gorm:"many2many:user_role" json:"sys_role" `                //	角色关联
+	OrganizationId uint             `gorm:"comment:组织代码" json:"orgId"`                           //编码
+	Organization   *SysOrganization `gorm:"foreignKey:OrganizationId"`                           //所属组织
 	model.ModelTime
 	model.ControlBy
 }

@@ -1,8 +1,8 @@
 /*
  * @Author: Profigogogogo wf851128@gmail.com
  * @Date: 2023-04-26 16:33:24
- * @LastEditors: Profigogogogo wf851128@gmail.com
- * @LastEditTime: 2023-04-26 20:48:01
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-04-27 00:13:23
  * @FilePath: /go-sys/init/initDB.go
  * @Description: 这个文件是用来初始化数据库中的超级管理员和组织结构数据
  */
@@ -11,15 +11,15 @@ package main
 import "go-sys/model"
 
 var superAdmin = model.SysUser{
-	UserName: "admin",
-	Password: "admin",
-	NickName: "超级管理员",
-	Sex:      "男",
-	Salt:     "salt",
-	Email:    "admin@company.com",
-	Phone:    "12345678901",
-	OrgID:    1,
-	Status:   1,
+	UserName:       "admin",
+	Password:       "admin",
+	NickName:       "超级管理员",
+	Sex:            "男",
+	Salt:           "salt",
+	Email:          "admin@company.com",
+	Phone:          "12345678901",
+	OrganizationId: 1,
+	Status:         1,
 }
 var superAdminRole = model.SysRole{
 	RoleName:  "超级管理员",
@@ -37,11 +37,11 @@ var rootOrg = model.SysOrganization{
 // main is used to init super admin and role
 func main() {
 	model.InitDB()
-	// initSuperAdmin()
-	// initRole()
-	// initpermissions()
-	// initrootOrg()
-	// setSuperAdminRoleAndPermissions()
+	initSuperAdmin()
+	initRole()
+	initpermissions()
+	initrootOrg()
+	setSuperAdminRoleAndPermissions()
 }
 
 // initSuperAdmin is used to init super admin
@@ -68,12 +68,12 @@ func initrootOrg() {
 // initpermissions is used to set permissions
 func initpermissions() {
 	permission1 := model.SysPermission{
-		PermissionID: 1,
+		PermissionId: 1,
 		Resource:     "example-resource",
 		Action:       "example-action-1",
 	}
 	permission2 := model.SysPermission{
-		PermissionID: 2,
+		PermissionId: 2,
 		Resource:     "example-resource",
 		Action:       "example-action-2",
 	}
@@ -89,12 +89,12 @@ func initpermissions() {
 
 // setSuperAdminRole is used to set super admin role and permissions
 func setSuperAdminRoleAndPermissions() {
-	// 添加全部权限到超级管理员角色
+	// 查询所有的权限
 	var permissions []model.SysPermission
 	if err := model.GlobalDB.Find(&permissions).Error; err != nil {
 		panic(err)
 	}
-
+	// 将权限关联到角色
 	if err := model.GlobalDB.Model(&superAdminRole).
 		Association("Permissions").
 		Append(permissions); err != nil {
@@ -104,6 +104,17 @@ func setSuperAdminRoleAndPermissions() {
 	// 将超级管理员关联到角色
 	superAdminRole.Users = append(superAdminRole.Users, &superAdmin)
 	if err := model.GlobalDB.Save(&superAdminRole).Error; err != nil {
+		panic(err)
+	}
+	//查询所有的成员
+	var users []model.SysUser
+	if err := model.GlobalDB.Find(&users).Error; err != nil {
+		panic(err)
+	}
+	// 将成员关联到组织
+	if err := model.GlobalDB.Model(&rootOrg).
+		Association("Users").
+		Append(users); err != nil {
 		panic(err)
 	}
 }
