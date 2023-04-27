@@ -2,7 +2,7 @@
  * @Author: Profigogogogo wf851128@gmail.com
  * @Date: 2023-04-26 21:13:43
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2023-04-27 10:50:17
+ * @LastEditTime: 2023-04-27 11:40:30
  * @FilePath: /go-sys/model/sys_user.go
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -54,9 +54,13 @@ func (sys *SysUser) Encrypt() (err error) {
 	if sys.Password == "" {
 		return
 	}
-
+	//  生成加盐密码
 	var hash []byte
-	if hash, err = bcrypt.GenerateFromPassword([]byte(sys.Password), bcrypt.DefaultCost); err != nil {
+	saltBytes := []byte(sys.Salt)
+	passwordBytes := []byte(sys.Password)
+	combinedBytes := append(passwordBytes, saltBytes...)
+	// 将密码进行加密
+	if hash, err = bcrypt.GenerateFromPassword([]byte(combinedBytes), bcrypt.DefaultCost); err != nil {
 		return
 	} else {
 		sys.Password = string(hash)
@@ -79,9 +83,8 @@ func (sys *SysUser) BeforeUpdate(_ *gorm.DB) error {
 }
 
 // 1. 在查询数据库时，gorm 会自动调用 AfterFind 函数，将查询到的数据赋值给 SysUser 对象
-// 2. 在调用 AfterFind 函数时，SysUser 对象的 DeptIds、PostIds、RoleIds 字段还没有赋值，所以需要在 AfterFind 函数中手动赋值
-// 3. 在调用 AfterFind 函数时，SysUser 对象的 Dept、Post、Role 字段还没有赋值，所以需要在 AfterFind 函数中手动赋值
+
 // func (e *SysUser) AfterFind(_ *gorm.DB) error {
-// 	e.Roles = []int{e.Roles}
+// 	e.Roles = []*SysRole{e.Roles}
 // 	return nil
 // }
